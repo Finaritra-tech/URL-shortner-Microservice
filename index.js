@@ -19,6 +19,17 @@ app.get('/api/hello', function(req, res) {
   res.json({ greeting: 'hello API' });
 });
 
+app.use(express.urlencoded({ extended: true }));
+
+app.post('/api/shorturl', (req, res) => {
+  let urls = []
+  const url = req.body.url
+  const shortId = urls.length + 1;
+  urls.push({ original_url: url, short_url: shortId });
+
+  res.json({original_url : url, short_url : shortId })
+})
+
 app.listen(port, function() {
   console.log(`Listening on port ${port}`);
 });
