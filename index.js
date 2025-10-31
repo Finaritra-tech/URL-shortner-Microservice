@@ -2,6 +2,9 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const app = express();
+const dns = require('dns');
+
+
 
 // Basic Configuration
 const port = process.env.PORT || 3000;
@@ -21,13 +24,35 @@ app.get('/api/hello', function(req, res) {
 
 app.use(express.urlencoded({ extended: true }));
 
+var urls = []
 app.post('/api/shorturl', (req, res) => {
-  let urls = []
   const url = req.body.url
-  const shortId = urls.length + 1;
-  urls.push({ original_url: url, short_url: shortId });
+  
+  try {
+    const { hostname } = new URL(url);
+  
+    dns.lookup(hostname, (err) => {
+      if (err) {
+        return res.status(404).json({error : "invalid url"});
+      }
+      const shortId = urls.length + 1;
+      urls.push({ original_url: url, short_url: shortId });
+      res.json({original_url : url, short_url : shortId })
+    });
+  } catch (e) {
+    res.status(400).json({error : "invalid url"});
+  }
+  
+})
+app.get('/api/shorturl/:shortId', (req, res) =>{
+  const short = parseInt(req.params.shortId);
+  const original = urls.find(p => p.short_url === short);
 
-  res.json({original_url : url, short_url : shortId })
+  if(original){
+    res.redirect(original.original_url);
+  }else{
+    res.status(404).json({ message: "shortURL non trouvé" });
+  }
 })
 
 app.listen(port, function() {
