@@ -51,7 +51,7 @@ app.get('/api/shorturl/:shortId', (req, res) =>{
   if(original){
     res.redirect(original.original_url);
   }else{
-    res.status(404).json({ message: "shortURL non trouvé" });
+    res.status(404).json({ error: 'invalid url' });
   }
 })
 
