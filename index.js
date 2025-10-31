@@ -29,14 +29,16 @@ app.post('/api/shorturl', (req, res) => {
   const url = req.body.url
   
   try {
-     const parsedUrl = new URL(url);
+     try {
+    const parsedUrl = new URL(url);
 
     if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
       return res.json({ error: "invalid url" });
     }
-    dns.lookup(hostname, (err) => {
+
+    dns.lookup(parsedUrl.hostname, (err) => {
       if (err) {
-        return res.status(404).json({error : "invalid url"});
+        return res.json({ error: "invalid url" });
       }
       const shortId = urls.length + 1;
       urls.push({ original_url: url, short_url: shortId });
