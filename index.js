@@ -29,8 +29,11 @@ app.post('/api/shorturl', (req, res) => {
   const url = req.body.url
   
   try {
-    const { hostname } = new URL(url);
-  
+     const parsedUrl = new URL(url);
+
+    if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+      return res.json({ error: "invalid url" });
+    }
     dns.lookup(hostname, (err) => {
       if (err) {
         return res.status(404).json({error : "invalid url"});
